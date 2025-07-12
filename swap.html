@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Swap Requests</title>
+</head>
+<body>
+    <h1>Your Swap Requests</h1>
+
+    <h2>Pending Requests</h2>
+    <ul>
+        {% for swap in pending_swaps %}
+            <li>
+                From: {{ swap.from_user }} - Offering: {{ swap.skill_offered }} 
+                <br>
+                Requested: {{ swap.skill_requested }}
+                <br>
+                <button onclick="respondSwap('{{ swap.from_user }}', 'accept')">Accept</button>
+                <button onclick="respondSwap('{{ swap.from_user }}', 'reject')">Reject</button>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Accepted Requests</h2>
+    <ul>
+        {% for swap in accepted_swaps %}
+            <li>
+                From: {{ swap.from_user }} - Offering: {{ swap.skill_offered }} 
+                <br>
+                Requested: {{ swap.skill_requested }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Rejected Requests</h2>
+    <ul>
+        {% for swap in rejected_swaps %}
+            <li>
+                From: {{ swap.from_user }} - Offering: {{ swap.skill_offered }} 
+                <br>
+                Requested: {{ swap.skill_requested }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">Back to Home</a>
+
+    <script>
+        function respondSwap(fromUser , action) {
+            fetch('/respond_swap', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from_user: fromUser ,
+                    action: action
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload(); // Reload the page to see updated requests
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
